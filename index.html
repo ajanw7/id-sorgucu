@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>FSOCIETY SCANNER</title>
+
+<style>
+body{
+margin:0;
+background:#0a0a0a;
+color:#ff0033;
+font-family:monospace;
+text-align:center;
+overflow:hidden;
+}
+canvas{position:fixed;top:0;left:0;z-index:-2;}
+.bg{
+position:fixed;width:100%;height:100%;
+background: radial-gradient(circle, rgba(255,0,50,0.15), black 70%);
+z-index:-1;
+}
+.auth,.panel{
+position:absolute;top:50%;left:50%;
+transform:translate(-50%,-50%);
+}
+input{
+padding:12px;margin:10px;width:240px;
+background:black;border:1px solid red;color:red;
+}
+button{
+padding:12px 20px;background:red;border:none;
+color:white;cursor:pointer;
+}
+.box{
+background:rgba(0,0,0,0.85);
+border:1px solid red;
+padding:30px;border-radius:15px;
+box-shadow:0 0 30px red;
+}
+#ipBox{
+width:400px;height:150px;
+background:black;color:red;
+border:1px solid red;
+overflow-y:auto;margin-top:20px;
+padding:10px;text-align:left;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="matrix"></canvas>
+<div class="bg"></div>
+
+<!-- LOGIN -->
+<div class="auth" id="auth">
+<h1>FSOCIETY ACCESS</h1>
+<input id="user" placeholder="username">
+<input id="pass" type="password" placeholder="password">
+<div id="error"></div>
+<button onclick="login()">LOGIN</button>
+</div>
+
+<!-- PANEL -->
+<div class="panel" id="panel" style="display:none;">
+<div class="box">
+
+<h2>KULLANICI PANELİ</h2>
+
+<input id="input" placeholder="Discord ID / Username">
+<button onclick="search()">ARA</button>
+
+<div id="result"></div>
+
+<h3>Siteye giren IP’ler:</h3>
+<div id="ipBox"></div>
+
+</div>
+</div>
+
+<script>
+
+/* LOGIN */
+function login(){
+auth.style.display="none";
+panel.style.display="block";
+
+getRealIP();
+loadIPs();
+}
+
+/* SEARCH */
+function search(){
+let val=input.value;
+result.innerText="User: user_"+val+" | ID: "+val;
+}
+
+/* SADECE SERVER'A IP GÖNDER */
+async function getRealIP(){
+await fetch('/save-ip',{method:'POST'});
+}
+
+/* SERVERDAN TÜM IP'LERİ ÇEK */
+async function loadIPs(){
+let res = await fetch('/get-ips');
+let data = await res.json();
+
+let box = document.getElementById("ipBox");
+box.innerHTML="";
+
+data.forEach(ip=>{
+let p=document.createElement("p");
+p.innerText=ip;
+box.appendChild(p);
+});
+}
+
+/* 5 SN'DE BİR YENİLE */
+setInterval(loadIPs,5000);
+
+</script>
+
+</body>
+</html>
